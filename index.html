@@ -53,6 +53,7 @@ img, video {
   object-fit: cover;
   filter: brightness(0.65); /* Un poco más de brillo para que se aprecie mejor */
   backface-visibility: hidden;
+  pointer-events: none; /* Evita interferencias con eventos táctiles e inputs */
 }
 
 /* Cero fondos, cero cajas grises, cero bordes para una transparencia 100% real */
@@ -600,7 +601,7 @@ button:hover{
 
   <form class="login-form-full" id="blLoginForm">
     <input id="userName" type="text" placeholder="Usuario" autocomplete="off" required>
-    <input id="userPassword" type="password" placeholder="Contraseña" autocomplete="off" required>
+    <input id="userPassword" type="password" placeholder="Contraseña" autocomplete="current-password" required>
     <input id="licenseKey" type="text" placeholder="XXXX-XXXX-XXXX" autocomplete="off" required>
     <button type="submit">ACTIVAR Y ENTRAR</button>
     <p id="loginStatus" class="login-status"></p>
@@ -1655,7 +1656,7 @@ function renderSongs(list){
     const card=document.createElement("div");
     card.className="card song-card";
     card.innerHTML=`
-      <img src="${song.coverUrl}" onerror="this.src='logo.png'">
+      <img src="${song.coverUrl}" loading="lazy" onerror="this.src='logo.png'">
       <h3>${song.title}</h3>
       <p>${song.artist}</p>
     `;
@@ -1677,7 +1678,7 @@ function renderRows(list,container){
     const row=document.createElement("div");
     row.className="row";
     row.innerHTML=`
-      <img src="${song.coverUrl}" onerror="this.src='logo.png'">
+      <img src="${song.coverUrl}" loading="lazy" onerror="this.src='logo.png'">
       <div style="flex:1">
         <b>${song.title}</b><br>
         <span class="muted">${song.artist} • ${song.genre}</span>
@@ -1708,7 +1709,7 @@ function renderArtists(){
     const card = document.createElement("div");
     card.className = "artist-card";
     card.innerHTML = `
-      <img src="${artist.image}" onerror="this.src='logo.png'">
+      <img src="${artist.image}" loading="lazy" onerror="this.src='logo.png'">
       <h3>${artist.name}</h3>
       <p class="muted">${artistSongs.length} canciones</p>
     `;
@@ -1726,7 +1727,7 @@ function showArtistSongs(artist){
   $("search").innerHTML = `
     <button id="backToArtists" class="back-btn btn">⬅ Retroceder</button>
     <div class="artist-title">
-      <img src="${artist.image}" onerror="this.src='logo.png'">
+      <img src="${artist.image}" loading="lazy" onerror="this.src='logo.png'">
       <div>
         <h1>${artist.name}</h1>
         <p class="muted">${artistSongs.length} canciones</p>
