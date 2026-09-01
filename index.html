@@ -1,0 +1,1950 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bolito MUSIC</title>
+
+<!-- Librerías de Firebase en tiempo real -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7405051683099774"
+     crossorigin="anonymous"></script>
+
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial}
+
+:root{
+  --red:#e50914;
+  --text:#fff;
+  --muted:#aaa;
+}
+
+body{
+  background: transparent !important;
+  color:white;
+  overflow-x:hidden;
+}
+
+/* Renderizado de alta calidad para imágenes */
+img, video {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: high-quality;
+  transform: translateZ(0);
+}
+
+/* Video fijo en el fondo abarcando toda la pantalla */
+#bg-video,
+.global-bg-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  min-width: 100%;
+  min-height: 100%;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  object-fit: cover;
+  filter: brightness(0.65); /* Un poco más de brillo para que se aprecie mejor */
+  backface-visibility: hidden;
+}
+
+/* Cero fondos, cero cajas grises, cero bordes para una transparencia 100% real */
+body,
+.sidebar,
+.main-container,
+.app,
+.card,
+.song-card,
+.row,
+.artist-card,
+.hero,
+button,
+.btn,
+.nav-item,
+.content,
+.topbar,
+.page {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  backdrop-filter: none !important;
+}
+
+button, .btn {
+  background-color: transparent !important;
+  border: 0 !important;
+  outline: none !important;
+  color: #fff;
+  cursor: pointer;
+}
+
+.hidden{display:none!important}
+
+.splash{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  gap:16px;
+  background:transparent !important;
+}
+
+.splash img{
+  width:170px;
+  height:170px;
+  object-fit:contain;
+  border-radius:18px;
+}
+
+.splash h1{
+  font-size:56px;
+  color:#fff;
+  letter-spacing:1px;
+  text-shadow: 0 4px 10px rgba(0,0,0,0.9);
+}
+
+.splash h1::after{
+  content:"";
+  display:block;
+  width:150px;
+  height:5px;
+  background:var(--red);
+  border-radius:20px;
+  margin:8px auto 0;
+}
+
+.splash p{
+  color:#ddd;
+  text-shadow: 0 2px 5px rgba(0,0,0,0.9);
+}
+
+button:hover{
+  filter:brightness(1.2);
+  transform:translateY(-1px);
+}
+
+.back-btn{
+  margin-bottom:18px;
+}
+
+.app{
+  display:grid;
+  grid-template-columns:240px 1fr;
+  min-height:100vh;
+  padding-bottom:96px;
+}
+
+.sidebar{
+  padding:20px;
+  position:sticky;
+  top:0;
+  height:100vh;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:25px;
+}
+
+.brand img{
+  width:45px;
+  height:45px;
+  object-fit:contain;
+  border-radius:10px;
+}
+
+.brand h2{
+  font-size:24px;
+  text-shadow: 0 2px 5px rgba(0,0,0,0.9);
+}
+
+.sidebar button{
+  display:block;
+  width:100%;
+  margin:10px 0;
+  text-align:left;
+  padding:12px 18px;
+  border-radius:14px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.sidebar button:hover{
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.content{padding:25px}
+
+.topbar input{
+  width:100%;
+  padding:15px;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,0.3) !important;
+  background: rgba(0, 0, 0, 0.3) !important;
+  color:white;
+  margin-bottom:25px;
+  outline:none;
+}
+
+.topbar input:focus{border-color:var(--red) !important}
+
+.page{display:none}
+.page.active{display:block}
+
+.hero{
+  padding:20px 0;
+  margin-bottom:15px;
+}
+
+.hero h1{
+  font-size:36px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+}
+.hero p,.muted{
+  color:#ddd;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:18px;
+}
+
+.card{
+  padding:8px;
+  cursor:pointer;
+  transition:.25s;
+}
+
+.card:hover{
+  transform:scale(1.03);
+}
+
+.card img{
+  width:100%;
+  aspect-ratio:1/1;
+  object-fit:cover;
+  border-radius:14px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.6) !important;
+}
+
+.card h3{
+  font-size:16px;
+  margin:10px 0 2px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+}
+
+.card p{
+  color:#ccc;
+  font-size: 13px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+}
+
+.list{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:10px;
+  cursor:pointer;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+  border-radius: 12px;
+}
+
+.row:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.row img{
+  width:60px;
+  height:60px;
+  border-radius:12px;
+  object-fit:cover;
+}
+
+.artists-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:18px;
+}
+
+.artist-card{
+  padding:16px;
+  text-align:center;
+  cursor:pointer;
+  transition:.25s;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+}
+
+.artist-card:hover{
+  transform:scale(1.04);
+}
+
+.artist-card img{
+  width:130px;
+  height:130px;
+  border-radius:50%;
+  object-fit:cover;
+  margin-bottom:10px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.6) !important;
+}
+
+.artist-card h3{font-size:16px}
+
+.artist-title{
+  display:flex;
+  align-items:center;
+  gap:15px;
+  margin-bottom:20px;
+}
+
+.artist-title img{
+  width:85px;
+  height:85px;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid var(--red) !important;
+}
+
+/* Reproductor inferior sutilmente oscurecido solo para lectura */
+.player{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  background: linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.6)) !important;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px 18px;
+  z-index:99;
+}
+
+.player img{
+  width:62px;
+  height:62px;
+  border-radius:12px;
+  object-fit:cover;
+}
+
+.player-info{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+}
+
+.player-info span{color:var(--muted)}
+
+.player button{
+  border-radius:50%;
+  padding:10px 13px;
+}
+
+#progress{
+  width:100%;
+  accent-color:var(--red);
+}
+
+#timeInfo{
+  font-size:12px;
+  color:#ddd;
+}
+
+.volume-box{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.back-to-top{
+  position:fixed;
+  right:24px;
+  bottom:115px;
+  width:48px;
+  height:48px;
+  border-radius:50%;
+  padding:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+  line-height:1;
+  z-index:98;
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(12px);
+  transition:opacity .25s ease, visibility .25s ease, transform .25s ease;
+}
+
+.back-to-top.show{
+  opacity:1;
+  visibility:visible;
+  transform:translateY(0);
+}
+
+.ad-slot{
+  width:100%;
+  min-height:90px;
+  margin-top:28px;
+  padding:10px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+.ad-slot:empty::before{
+  content:"PUBLICIDAD";
+  color:#aaa;
+  font-size:11px;
+  letter-spacing:1px;
+}
+
+#volume{
+  width:120px;
+  accent-color:var(--red);
+}
+
+#volumeText{
+  font-size:13px;
+  color:#ddd;
+  min-width:45px;
+}
+
+@media(max-width:800px){
+  .app{grid-template-columns:1fr}
+
+  .sidebar{
+    position:fixed;
+    bottom:0;
+    top:auto;
+    left:0;
+    right:0;
+    height:65px;
+    display:flex;
+    overflow:auto;
+    z-index:100;
+    padding:7px;
+    background: rgba(0,0,0,0.85) !important;
+  }
+
+  .brand{display:none}
+
+  .sidebar button{
+    min-width:100px;
+    font-size:12px;
+    margin:0;
+  }
+
+  .content{padding:15px 12px 160px}
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .player{bottom:65px;padding:8px}
+  .ad-slot{display:none}
+  .back-to-top{
+    right:14px;
+    bottom:145px;
+    width:46px;
+    height:46px;
+  }
+  #volume{width:80px}
+  #volumeText{font-size:11px;min-width:38px}
+  .splash h1{font-size:42px}
+  .artist-card img{width:105px;height:105px}
+}
+
+/* LOGIN 100% TRANSPARENTE */
+.login-screen{
+  position:fixed; 
+  inset:0; 
+  z-index:9999; 
+  display:flex; 
+  flex-direction:column;
+  align-items:center; 
+  justify-content:center;
+  background:transparent !important;
+  overflow:hidden; 
+  opacity:1; 
+  visibility:visible; 
+  transition:opacity .45s ease,visibility .45s ease;
+}
+
+.login-screen.hidden-login{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+}
+
+.login-brand-full{
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  margin-bottom: 6px;
+  text-shadow: 0 4px 15px rgba(0,0,0,0.9);
+  text-align: center;
+}
+
+.login-brand-full span{
+  color: var(--red);
+}
+
+.login-sub{
+  font-size: 15px;
+  color: #ddd;
+  margin-bottom: 25px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+  text-align: center;
+}
+
+.login-form-full{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  width:100%;
+  max-width:340px;
+}
+
+.login-form-full input{
+  padding:14px 18px;
+  border:1px solid rgba(255,255,255,0.4) !important;
+  border-radius:12px;
+  background:rgba(0,0,0,0.4) !important;
+  color:#fff;
+  outline:none !important;
+  font-size:15px;
+  text-align:center;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+}
+
+.login-form-full input::placeholder{
+  color: #ccc;
+}
+
+.login-form-full input:focus{
+  border-color:var(--red) !important;
+  background:rgba(0,0,0,0.6) !important;
+}
+
+.login-form-full button{
+  padding:15px;
+  background:var(--red) !important;
+  color:#fff;
+  cursor:pointer;
+  font-weight:800;
+  border-radius:12px;
+  font-size:15px;
+  letter-spacing: 1px;
+  transition:0.2s;
+  box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4) !important;
+}
+
+.login-form-full button:hover{
+  filter:brightness(1.2);
+  transform: translateY(-2px);
+}
+
+.login-status{
+  min-height:22px;
+  text-align:center;
+  font-size:13px;
+  color:#ff5252;
+  font-weight: 600;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+}
+
+.login-status.ok{
+  color:#00ff66;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Video de fondo principal para toda la app -->
+<video id="bg-video" class="global-bg-video" autoplay loop muted playsinline>
+  <source src="fondo.mp4" type="video/mp4">
+</video>
+
+<div id="splash" class="splash">
+  <img src="logo.png" onerror="this.style.display='none'">
+  <h1>Bolito MUSIC</h1>
+  <p>Tu música, tu estilo</p>
+  <button id="enterBtn" style="font-size: 18px; font-weight: bold; padding: 12px 30px; background: var(--red) !important; border-radius: 12px;">Entrar</button>
+</div>
+
+<!-- VISTA COMPLETA TRANSPARENTE: USUARIO, CONTRASEÑA Y KEY -->
+<section id="loginScreen" class="login-screen hidden-login" aria-hidden="true">
+  <div class="login-brand-full"><span>BL</span> MUSIC</div>
+  <p class="login-sub">Ingresa tus datos y tu clave de producto para ingresar</p>
+
+  <form class="login-form-full" id="blLoginForm">
+    <input id="userName" type="text" placeholder="Usuario" autocomplete="off" required>
+    <input id="userPassword" type="password" placeholder="Contraseña" autocomplete="off" required>
+    <input id="licenseKey" type="text" placeholder="XXXX-XXXX-XXXX" autocomplete="off" required>
+    <button type="submit">ACTIVAR Y ENTRAR</button>
+    <p id="loginStatus" class="login-status"></p>
+  </form>
+</section>
+
+<main id="app" class="app main-container hidden">
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="logo.png" onerror="this.style.display='none'">
+      <h2>Bolito MUSIC</h2>
+    </div>
+
+    <button data-page="home" class="btn nav-item">🏠 Inicio</button>
+    <button data-page="search" class="btn nav-item">🔎 Buscar</button>
+    <button data-page="artists" class="btn nav-item">👤 Artistas</button>
+    <button data-page="favorites" class="btn nav-item">💜 Favoritos</button>
+    <button data-page="library" class="btn nav-item">📚 Biblioteca</button>
+
+    <div class="ad-slot"></div>
+  </aside>
+
+  <section class="content">
+    <div class="topbar">
+      <input id="searchInput" placeholder="Buscar canción, artista o género...">
+    </div>
+
+    <section id="home" class="page active">
+      <div class="hero">
+        <h1>Bolito</h1>
+        <p>Reproduce tus canciones locales</p>
+      </div>
+
+      <h2>Canciones (94)</h2><br>
+      <div id="songsGrid" class="grid"></div>
+    </section>
+
+    <section id="search" class="page">
+      <h1>Buscar</h1><br>
+      <div id="searchResults" class="list"></div>
+    </section>
+
+    <section id="artists" class="page">
+      <button id="backFromArtists" class="back-btn btn">⬅ Retroceder</button>
+      <h1>Artistas</h1><br>
+      <div id="artistsGrid" class="artists-grid"></div>
+    </section>
+
+    <section id="favorites" class="page">
+      <h1>Favoritos</h1><br>
+      <div id="favoritesList" class="list"></div>
+    </section>
+
+    <section id="library" class="page">
+      <h1>Biblioteca</h1>
+      <p class="muted">Tus canciones guardadas localmente.</p>
+    </section>
+  </section>
+</main>
+
+<div id="player" class="player player-bar hidden">
+  <img id="playerCover">
+
+  <div class="player-info">
+    <b id="playerTitle">Canción</b>
+    <span id="playerArtist">Artista</span>
+    <input id="progress" type="range" min="0" max="100" value="0">
+    <div id="timeInfo">0:00 / 0:00</div>
+  </div>
+
+  <button id="prevBtn" class="btn">⏮</button>
+  <button id="playBtn" class="btn">▶</button>
+  <button id="nextBtn" class="btn">⏭</button>
+  <button id="favBtn" class="btn">♡</button>
+
+  <div class="volume-box">
+    <input id="volume" type="range" min="0" max="100" step="1" value="100">
+    <span id="volumeText">100%</span>
+  </div>
+</div>
+
+<audio id="audio"></audio>
+
+<button id="backToTop" class="back-to-top btn" aria-label="Volver arriba" title="Volver arriba">↑</button>
+
+<script>
+// LISTA DE KEYS VÁLIDAS
+const VALID_KEYS = new Set([
+  "BL-5E46-FBC4",
+  "BL-2CBE-25E6",
+  "BL-4E9F-7EA9",
+  "BL-1915-4403",
+  "BL-22F0-00B0",
+  "BL-7F29-ADE1",
+  "BL-20BB-C209",
+  "BL-62EF-7A2E",
+  "BL-7E50-D77C",
+  "BL-3700-5EC3",
+  "BL-3460-DE69",
+  "BL-7AB4-2908",
+  "BL-61A3-05D1",
+  "BL-39C0-E92A",
+  "BL-510F-24A5",
+  "BL-43E5-7FA7",
+  "BL-5EC6-5558",
+  "BL-26D9-A799",
+  "BL-4706-0E68",
+  "BL-242C-5DBF",
+  "BL-0D1A-7C10",
+  "BL-653D-0A94",
+  "BL-2FA8-3534",
+  "BL-77D6-08BB"
+]);
+
+// CONFIGURACIÓN DE FIREBASE
+const firebaseConfig = {
+  apiKey: "TU_API_KEY",
+  authDomain: "tu-app.firebaseapp.com",
+  projectId: "tu-app-id",
+  storageBucket: "tu-app.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abc123def"
+};
+
+if (firebaseConfig.apiKey !== "TU_API_KEY") {
+  firebase.initializeApp(firebaseConfig);
+}
+
+const songs = [
+  {
+    "title": "SECUESTRO",
+    "artist": "Ñengo Flow x La Mafia del Amor",
+    "genre": "Reggaeton",
+    "audioUrl": "music/(FREE) Ñengo Flow x La Mafia del Amor Reggaeton Old School   SECUESTRO.mp3",
+    "coverUrl": "covers/Ñengo Flow x La Mafia del Amor.png"
+  },
+  {
+    "title": "faceshot",
+    "artist": "1tappworky",
+    "genre": "Rap",
+    "audioUrl": "music/1tappworky - faceshot.mp3",
+    "coverUrl": "covers/1tappworky - faceshot.png"
+  },
+  {
+    "title": "Cumbia 44",
+    "artist": "8Uno",
+    "genre": "Cumbia",
+    "audioUrl": "music/8Uno - Cumbia 44 (Video Oficial).mp3",
+    "coverUrl": "covers/Cumbia44.png"
+  },
+  {
+    "title": "Marino V2",
+    "artist": "8Uno",
+    "genre": "Cumbia",
+    "audioUrl": "music/8uno - marino v2 (cumbia belica) Hijos del golfo.mp3",
+    "coverUrl": "covers/8uno - marino v2.png"
+  },
+  {
+    "title": "A Su Vato Engaña",
+    "artist": "Santa Grifa",
+    "genre": "Urbano",
+    "audioUrl": "music/A Su Vato Engaña.mp3",
+    "coverUrl": "covers/A Su Vato Engaña.png"
+  },
+  {
+    "title": "Alcoholizados",
+    "artist": "Santa Grifa",
+    "genre": "Rap",
+    "audioUrl": "music/Alcoholizados - Santa Grifa (Video Oficial).mp3",
+    "coverUrl": "covers/Alcoholizados - Santa Grifa.png"
+  },
+  {
+    "title": "Ando en la Disco",
+    "artist": "50/50",
+    "genre": "Urbano",
+    "audioUrl": "music/Ando en la Disco (Da Players Town).mp3",
+    "coverUrl": "covers/Ando en la Disco.png"
+  },
+  {
+    "title": "I Smoked Away My Brain",
+    "artist": "ASAP Rocky",
+    "genre": "Rap",
+    "audioUrl": "music/ASAP Rocky - I Smoked Away My Brain (Im God x Demons Remix).mp3",
+    "coverUrl": "covers/I Smoked Away My Brain.png"
+  },
+  {
+    "title": "Brooklyn Baby",
+    "artist": "Lana Del Rey",
+    "genre": "Alternative",
+    "audioUrl": "music/Brooklyn Baby.mp3",
+    "coverUrl": "covers/Brooklyn Baby.png"
+  },
+  {
+    "title": "Un Ratito Más",
+    "artist": "Bryant Myers",
+    "genre": "Trap",
+    "audioUrl": "music/Bryant Myers - Un Ratito Mas ft. Bad Bunny (Video Oficial).mp3",
+    "coverUrl": "covers/Bryant Myers - Un Ratito Mas.png"
+  },
+  {
+    "title": "GANAS",
+    "artist": "KRIS R",
+    "genre": "Urbano",
+    "audioUrl": "music/Clipto AI Video Downloader KRIS R - GANAS ❤️_🩹 (VIDEO OFICIAL).mp4",
+    "coverUrl": "covers/KRIS R - GANAS.png"
+  },
+  {
+    "title": "TUKI TUKI",
+    "artist": "KRIS R",
+    "genre": "Urbano",
+    "audioUrl": "music/KRIS R x GEEZYDEE - TUKI TUKI.mp3",
+    "coverUrl": "covers/KRIS R ❌ GEEZYDEE - TUKI TUKI.png"
+  },
+  {
+    "title": "MURMURAN",
+    "artist": "El Americano 4kt",
+    "genre": "Urbano",
+    "audioUrl": "music/MURMURAN (EL AMERICANO 4kt).mp3",
+    "coverUrl": "covers/MURMURAN (EL AMERICANO 4kt).png"
+  },
+  {
+    "title": "COMANDANTE COMINO",
+    "artist": "El Makabelico",
+    "genre": "Corridos",
+    "audioUrl": "music/Comandante Camino (Fuerzas Especiales) - El Makabelico.mp3",
+    "coverUrl": "covers/COMANDANTE COMINO.png"
+  },
+  {
+    "title": "Como Me Encula Esa Dama",
+    "artist": "Santa Grifa",
+    "genre": "Rap",
+    "audioUrl": "music/Como Me Encula Esa Dama.mp3",
+    "coverUrl": "covers/Como Me Encula Esa Dama.png"
+  },
+  {
+    "title": "EL CASPER",
+    "artist": "Jan Glack",
+    "genre": "Corridos",
+    "audioUrl": "music/El Casper (JAN GLACK) Recortada (sin la última parte).mp3",
+    "coverUrl": "covers/EL CASPER.png"
+  },
+  {
+    "title": "No one noticed ( extended spanish )",
+    "artist": "Jartista desconocido",
+    "genre": "Sad gril",
+    "audioUrl": "music/No one noticed.mp4",
+    "coverUrl": "covers/No one noticed.png"
+  },
+  {
+    "title": "Lucifer V1",
+    "artist": "El Makabelico",
+    "genre": "Belicas",
+    "audioUrl": "music/lucifer.mp4",
+    "coverUrl": "covers/lucifer.png"
+  },
+  {
+    "title": "Amor Bandido V2",
+    "artist": "Jan Glack",
+    "genre": "Belicas",
+    "audioUrl": "music/amor.mp4",
+    "coverUrl": "covers/amor.png"
+  },
+  {
+    "title": "Nou Nou Nou",
+    "artist": "Artista desconocido",
+    "genre": "Reggaeton",
+    "audioUrl": "music/nounou.mp3",
+    "coverUrl": "covers/nounou.png"
+  },
+  {
+    "title": "Sabanas Blancas",
+    "artist": "Artista desconocido",
+    "genre": "Reggaeton",
+    "audioUrl": "music/Sabanas Blancas.mp3",
+    "coverUrl": "covers/sabanas.png"
+  },
+  {
+    "title": "3 De La Mañana",
+    "artist": "Artista desconocido",
+    "genre": "Reggaeton",
+    "audioUrl": "music/3 De La Mañana.mp3",
+    "coverUrl": "covers/3 De La Mañana.png"
+  },
+  {
+    "title": "KING OF WATCHES",
+    "artist": "Artista desconocido",
+    "genre": "Reggaeton",
+    "audioUrl": "music/KING OF WATCHES.mp3",
+    "coverUrl": "covers/KING OF WATCHES.png"
+  },
+
+  {
+    "title": "Ritmada Antidepressiva",
+    "artist": "Artista desconocido",
+    "genre": "Brazuca",
+    "audioUrl": "music/Ritmada Antidepressiva.mp3",
+    "coverUrl": "covers/Ritmada Antidepressiva.png"
+  },
+  {
+    "title": "Amor Bandido V2",
+    "artist": "Jan Glack",
+    "genre": "Belicas",
+    "audioUrl": "music/Las Leyendas.mp3",
+    "coverUrl": "covers/Las Leyendas.png"
+  },
+  {
+    "title": "Choreando",
+    "artist": "Artista desconocido",
+    "genre": "Barrio",
+    "audioUrl": "music/Choreando.mp3",
+    "coverUrl": "covers/Choreando.png"
+  },
+  {
+    "title": "El Chamuko",
+    "artist": "El Makabelico",
+    "genre": "Urbano",
+    "audioUrl": "music/El Chamuko  (Versión Dos).mp3",
+    "coverUrl": "covers/El Chamuko (Versión Dos).png"
+  },
+  {
+    "title": "EL CHAPARRO",
+    "artist": "Jan Glack",
+    "genre": "Corridos",
+    "audioUrl": "music/EL CHAPARRO.mp3",
+    "coverUrl": "covers/EL CHAPARRO.png"
+  },
+  {
+    "title": "EL CHUCHO DE LA JOYA V4",
+    "artist": "El Makabelico",
+    "genre": "Corridos",
+    "audioUrl": "music/El Chucho de la Joya V4 - El Makabelico.mp3",
+    "coverUrl": "covers/COMANDANTE COMINO.png"
+  },
+  {
+    "title": "EL CLUB V1",
+    "artist": "El Makabelico",
+    "genre": "Corridos",
+    "audioUrl": "music/El Club V1 - El Makabelico.mp3",
+    "coverUrl": "covers/El Club V1.png"
+  },
+  {
+    "title": "El Diablo Anda Suelto",
+    "artist": "Santa Grifa",
+    "genre": "Urbano",
+    "audioUrl": "music/El Diablo Anda Suelto.mp3",
+    "coverUrl": "covers/El Diablo Anda Suelto.png"
+  },
+  {
+    "title": "El Two Six",
+    "artist": "El Makabelico",
+    "genre": "Urbano",
+    "audioUrl": "music/El Two Six.mp3",
+    "coverUrl": "covers/El Two Six.png"
+  },
+  {
+    "title": "En Una Mancha",
+    "artist": "Yahir Saldivar",
+    "genre": "Regional",
+    "audioUrl": "music/En Una Mancha - Yahir Saldivar Feat. Los Parna (Video Oficial).mp3",
+    "coverUrl": "covers/En Una Mancha - Yahir Saldivar Feat.png"
+  },
+  {
+    "title": "Esclava Remix",
+    "artist": "Bryant Myers",
+    "genre": "Reggaeton",
+    "audioUrl": "music/Esclava (Remix).mp3",
+    "coverUrl": "covers/Esclava.png"
+  },
+  {
+    "title": "6 AM",
+    "artist": "J Balvin",
+    "genre": "Reggaeton",
+    "audioUrl": "music/J Balvin - 6 AM ft. Farruko.mp3",
+    "coverUrl": "covers/6 AM J BALVIN.png"
+  },
+  {
+    "title": "En Disney",
+    "artist": "Jamby El Favo",
+    "genre": "Urbano",
+    "audioUrl": "music/Jamby El Favo En Disney (Audio).mp3",
+    "coverUrl": "covers/En Disney.png"
+  },
+  {
+    "title": "Patrones",
+    "artist": "Jamby El Favo",
+    "genre": "Urbano",
+    "audioUrl": "music/Jamby El Favo - Patrones (Video Oficial).mp3",
+    "coverUrl": "covers/Patrones.png"
+ },
+ {
+    "title": "Darte Remix",
+    "artist": "Alex Rose",
+    "genre": "Urbano",
+    "audioUrl": "music/Darte Remix - Alex Rose Ft. Miky Woodz, Noriel, Ñengo Flow, Bryant Myers, Casper, Myke Towers.mp3",
+    "coverUrl": "covers/Darte Remix.png"
+ },
+ {
+    "title": "Diles Full Remix",
+    "artist": "Bad Bunny",
+    "genre": "Regaeton",
+    "audioUrl": "music/Diles Full Remix - Bad Bunny X Arcangel, Farruko, Ozuna Y Ñengo Flow.mp3",
+    "coverUrl": "covers/Diles Full Remix.png"
+ },
+ {
+    "title": "Cuatro Babys",
+    "artist": "Maluma",
+    "genre": "Regaeton",
+    "audioUrl": "music/Maluma - Cuatro Babys (Cover Audio) ft. Trap Capos, Noriel, Bryant Myers, Juhn.mp3",
+    "coverUrl": "covers/Cuatro Babys.png"
+  },
+  {
+    "title": "444 Remix",
+    "artist": "Yan Block",
+    "genre": "Regaeton",
+    "audioUrl": "music/Yan Block, De La Rose, Hades66, Ñengo Flow - 444 Remix (Video Oficial).mp3",
+    "coverUrl": "covers/444 Remix.png"
+  },
+  {
+    "title": "Los Franckys",
+    "artist": "El Makabelico",
+    "genre": "Belicas",
+    "audioUrl": "music/Los Franckys - Makabelico - SinMarkazz Mx.mp3",
+    "coverUrl": "covers/Los Franckys.jpeg"
+  },
+  {
+    "title": "35B",
+    "artist": "Jan Glack",
+    "genre": "Corridos",
+    "audioUrl": "music/Jan Glack & Droppers - 35B (Oficial).mp3",
+    "coverUrl": "covers/Jan Glack & Droppers.png"
+  },
+   {
+    "title": "EL FRANCKY 35",
+    "artist": "El Makabelico",
+    "genre": "Corridos",
+    "audioUrl": "music/EL FRANCKI (35 CHUCKIS) (V4).mp3",
+    "coverUrl": "covers/EL FRANCKY 35.png"
+  },
+  {
+    "title": "EL Takia V3",
+    "artist": "El Makabelico",
+    "genre": "Corridos",
+    "audioUrl": "music/El Takia V3 - El Makabelico.mp3",
+    "coverUrl": "covers/EL TAKIA V3.png"
+  },
+  {
+    "title": "MIENTRAS DUERMES",
+    "artist": "Junior H",
+    "genre": "Corridos",
+    "audioUrl": "music/Junior H - MIENTRAS DUERMES [Official Visualizer].mp3",
+    "coverUrl": "covers/MIENTRAS TU DUERMES.png"
+  },
+  {
+    "title": "El Alex V8",
+    "artist": "El Makabelico",
+    "genre": "Belicas",
+    "audioUrl": "music/El Alex V8 - Makabelico - SinMarkazz Mx.mp3",
+    "coverUrl": "covers/El Alex V8.jpeg"
+  },
+  {
+    "title": "Lokera X Amor",
+    "artist": "Junior H",
+    "genre": "Corridos",
+    "audioUrl": "music/Junior H - LOKERON X AMOR [Official Visualizer].mp3",
+    "coverUrl": "covers/LOKERA X AMOR.png"
+  },
+  {
+    "title": "LAS NOCHES",
+    "artist": "Junior H",
+    "genre": "Corridos",
+    "audioUrl": "music/Junior H - LAS NOCHES [Official Visualizer].mp3",
+    "coverUrl": "covers/LAS NOCHES.png"
+  },
+  {
+    "title": "Comandante Tiburon",
+    "artist": "50/50",
+    "genre": "Belicas",
+    "audioUrl": "music/Comandante Tiburon - 5050 EL BARRET (LETRA) - Galinddo.mp3",
+    "coverUrl": "covers/Comandante Tiburon.jpeg"
+  },
+  {
+    "title": "ENTRE NOSOTROS",
+    "artist": "Junior H",
+    "genre": "Corridos",
+    "audioUrl": "music/Junior H - ENTRE NOSOTROS   LETRA.mp3",
+    "coverUrl": "covers/ENTRE NOSOTROS.png"
+  },
+  {
+    "title": "Changuito Me Apodaron",
+    "artist": "Grupo Feroz",
+    "genre": "Corridos",
+    "audioUrl": "music/Changuito Me Apodaron (Video Oficial) - Grupo Feroz - Grupo Feroz.mp3",
+    "coverUrl": "covers/Changuito Me Apodaron.jpeg"
+  },
+  {
+    "title": "Junior H - Intro",
+    "artist": "Junior H",
+    "genre": "Corridos",
+    "audioUrl": "music/Junior H - Intro [Official Video].mp3",
+    "coverUrl": "covers/Junior H - Intro.png"
+  },
+  {
+    "title": "FLOW ARABE",
+    "artist": "Pressure9x19",
+    "genre": "Flow",
+    "audioUrl": "music/@GTRICKZ x PRESSURE 9x19 - FLOW ARABE (Official Music Video).mp3",
+    "coverUrl": "covers/PRESSURE 9x19 - FLOW ARABE.png"
+  },
+  {
+    "title": "Vvs switch",
+    "artist": "Pressure9x19",
+    "genre": "Flow",
+    "audioUrl": "music/Pressure9x19 - Vvs switch (Official Video).mp3",
+    "coverUrl": "covers/PRESSURE 9x19 - FLOW ARABE.png"
+  },
+  {
+    "title": "SI ESTÁS CON ALGUIEN",
+    "artist": "Omar Courtz",
+    "genre": "Corrido",
+    "audioUrl": "music/Omar Courtz- SI ESTÁS CON ALGUIEN (Video Lyrics).mp3",
+    "coverUrl": "covers/SI ESTÁS CON ALGUIEN.png"
+  },
+  {
+    "title": "Me Mata",
+    "artist": "Bad Bunny",
+    "genre": "Reggaeton",
+    "audioUrl": "music/Me Mata.mp3",
+    "coverUrl": "covers/Me Mata.png"
+  },
+  {
+    "title": "LA CARAVANA",
+    "artist": "Yahir  Saldivar",
+    "genre": "Urbano",
+    "audioUrl": "music/LA CARAVANA! VIDEO OFICIAL X (BANDI2).mp3",
+    "coverUrl": "covers/LA CARAVANA! VIDEO OFICIAL X (BANDI2).png"
+  },
+  {
+    "title": "LA CHIMICHANGA",
+    "artist": "Yahir Saldivar",
+    "genre": "Urbano",
+    "audioUrl": "music/LA CHIMICHANGA (SC 9 VIDEO OFICIAL!.mp3",
+    "coverUrl": "covers/LA CHIMICHANGA.png"
+  },
+  {
+    "title": "Mal Ejemplo",
+    "artist": "Santa Grifa",
+    "genre": "Urbano",
+    "audioUrl": "music/Mal Ejemplo.mp3",
+    "coverUrl": "covers/Mal Ejemplo.png"
+  },
+  {
+    "title": "MARTINEZ V1",
+    "artist": "El Makabelico",
+    "genre": "Corridos",
+    "audioUrl": "music/MARTINEZ V1 MADDI MOV (5-7 beat).mp3",
+    "coverUrl": "covers/MARTINEZ V1.png"
+  },
+  {
+    "title": "Gorillaz - Tormenta ft",
+    "artist": "Bad Bunny",
+    "genre": "Regaeton",
+    "audioUrl": "music/Gorillaz - Tormenta ft. Bad Bunny (Official Visualiser).mp3",
+    "coverUrl": "covers/Gorillaz - Tormenta ft.png"
+  },
+  {
+    "title": "El R",
+    "artist": "El Makabelico",
+    "genre": "Belicas",
+    "audioUrl": "music/El Makabelico - El R (comando exclusivo) - Somos Urbanos.mp3",
+    "coverUrl": "covers/El R.jpeg"
+  },
+  {
+    "title": "Khé?",
+    "artist": "Rauw Alejandro",
+    "genre": "Reggaeton",
+    "audioUrl": "music/Rauw Alejandro, Romeo Santos - Khé (Official Lyric Video).mp3",
+    "coverUrl": "covers/Khe.png"
+  },
+  {
+    "title": "Tu Chapo",
+    "artist": "Ele A El Dominio",
+    "genre": "Reggaeton",
+    "audioUrl": "music/Tu Chapo.mp3",
+    "coverUrl": "covers/Tu Chapo.png"
+  },
+  {
+    "title": "El takia v1",
+    "artist": "El Makabelico",
+    "genre": "Belicas",
+    "audioUrl": "music/El Takia V1 - El Makabelico - Robo Tracks.mp3",
+    "coverUrl": "covers/El takia v1.png"
+  },
+  {
+    "title": "Me La Paso Bien",
+    "artist": "Radi0",
+    "genre": "Belicas",
+    "audioUrl": "music/Me La Paso Bien.mp3",
+    "coverUrl": "covers/Me La Paso Bien.png"
+  },
+  {
+    "title": "3 AM",
+    "artist": "sin artista",
+    "genre": "Belicas",
+    "audioUrl": "music/3 AM.mp3",
+    "coverUrl": "covers/3 AM.png"
+  },
+  {
+    "title": "Profesion Bandido",
+    "artist": "El Makabelico",
+    "genre": "Belicas",
+    "audioUrl": "music/Profesion Bandido - El Makabelico - Robo Tracks.mp3",
+    "coverUrl": "covers/El takia v1.png"
+  },
+  {
+    "title": "EL HUEVO 35",
+    "artist": "El Yair",
+    "genre": "Belicas",
+    "audioUrl": "music/EL HUEVO  35  - EL YARI OFICIAL - 𝑬𝒍 𝑪𝒐𝒂𝒉𝒖𝒊𝒍𝒂.mp3",
+    "coverUrl": "covers/EL HUEVO 35.jpeg"
+  },
+  {
+    "title": "El tartas v2",
+    "artist": "El Makabelico",
+    "genre": "Belicas",
+    "audioUrl": "music/El Tartas V2 - El Makabelico - Robo Tracks.mp3",
+    "coverUrl": "covers/El tartas v2.jpeg"
+  },
+  {
+    "title": "Me Mata",
+    "artist": "Bad Bunny",
+    "genre": "Reggaeton",
+    "audioUrl": "music/Me Mata.mp3",
+    "coverUrl": "covers/Me Mata.png"
+  },
+  {
+    "title": "Perdóname las calacas V1",
+    "artist": "El Makabelico",
+    "genre": "Belicas",
+    "audioUrl": "music/Perdóname las calacas V1 - el Makabelico - SinMarkazz Mx.mp3",
+    "coverUrl": "covers/Perdóname las calacas V1.jpeg"
+  },
+  {
+    "title": "Comandante Balu",
+    "artist": "50/50",
+    "genre": "Belicas",
+    "audioUrl": "music/Comandante Balu - 5050 EL BARRET (LETRA) - Galinddo.mp3",
+    "coverUrl": "covers/Comandante Balu.jpeg"
+  },
+  {
+    "title": "EL FLACO MENDOZA",
+    "artist": "Desconocido",
+    "genre": "Belicas",
+    "audioUrl": "music/EL FLACO MENDOZA Sin Markas Musik - ERNESTO HERNANDEZ.mp3",
+    "coverUrl": "covers/EL FLACO MENDOZA.jpeg"
+  },
+  {
+    "title": "El Riko & Kevin El Gordo",
+    "artist": "El Makabelico",
+    "genre": "Belicas",
+    "audioUrl": "music/El Riko & Kevin El Gordo - El Makabelico - Robo Tracks.mp3",
+    "coverUrl": "covers/El Riko & Kevin El Gordo.jpeg"
+  },
+  {
+    "title": "El flako v1",
+    "artist": "El Makabelico",
+    "genre": "Belicas",
+    "audioUrl": "music/El flako v1 -makabelico - Music 2k.mp3",
+    "coverUrl": "covers/El flako v1.jpeg"
+  },
+  {
+    "title": "La Vali Kilos",
+    "artist": "El Makabelico",
+    "genre": "Belicas",
+    "audioUrl": "music/La Vali Kilos - El Makabelico - Robo Tracks.mp3",
+    "coverUrl": "covers/La Vali Kilos.jpeg"
+  },
+  {
+    "title": "AY JAN",
+    "artist": "Jan Glack",
+    "genre": "Belicas",
+    "audioUrl": "music/AY JAN__JAN GLACK - El Vázquez.mp3",
+    "coverUrl": "covers/AY JAN.jpeg"
+  },
+  {
+    "title": "Fuerzas Especiales Minimi",
+    "artist": "El Makabelico",
+    "genre": "Belicas",
+    "audioUrl": "music/Fuerzas Especiales Minimi - El Makabelico - Robo Tracks.mp3",
+    "coverUrl": "covers/Fuerzas Especiales Minimi - El Makabelico - Robo Tracks.jpeg"
+  },
+  {
+    "title": "Chiricuazo v4",
+    "artist": "El Makabelico",
+    "genre": "Belicas",
+    "audioUrl": "music/Chiricuazo v4 - XOLO.mp3",
+    "coverUrl": "covers/Chiricuazo v4 - XOLO.jpeg"
+  },
+  {
+    "title": "EL ONDEADO V2",
+    "artist": "El Makabelico",
+    "genre": "belicas",
+    "audioUrl": "music/Ondeado V2 - El Makabelico - Robo Tracks.mp3",
+    "coverUrl": "covers/El ondeado V2.png"
+  },
+  {
+    "title": "Hasta Que Amanezca",
+    "artist": "Joan Sebastian",
+    "genre": "romantica",
+    "audioUrl": "music/Joan Sebastian - Hasta Que Amanezca (Letra) - Rolitas Chidas Pa La Banda.mp3",
+    "coverUrl": "covers/Hasta Que Amanezca.png"
+  },
+  {
+    "title": "Nunca Me Amó",
+    "artist": "Jon Z",
+    "genre": "Reggaeton",
+    "audioUrl": "music/Jon Z x Baby Rasta x Boy Wonder CF - Nunca Me Amó [Official Video].mp3",
+    "coverUrl": "covers/Nunca Me Amó.png"
+  },
+  {
+    "title": "El Chino Infierno V2",
+    "artist": "El Makabelico",
+    "genre": "Belicas",
+    "audioUrl": "music/El Chino Infierno V2 - El Makabelico - Robo Tracks.mp3",
+    "coverUrl": "covers/El Chino Infierno V2.jpeg"
+  },
+  {
+    "title": "Piensalo",
+    "artist": "Junior H",
+    "genre": "Reggaeton",
+    "audioUrl": "music/Junior H - PIENSALO [Official Visualizer].mp3",
+    "coverUrl": "covers/Piensalo.png"
+  },
+{
+    "title": "A TU NOMBRE",
+    "artist": "Junior H",
+    "genre": "corridos",
+    "audioUrl": "music/Junior H - A TU NOMBRE [Official Visualizer].mp3",
+    "coverUrl": "covers/A TU NOMBRE.png"
+  },
+  {
+    "title": "La Ocasión",
+    "artist": "Mambo Kingz",
+    "genre": "Reggaeton",
+    "audioUrl": "music/La Ocasión - De La Ghetto, Arcangel, Ozuna, Anuel Aa, Dj Luian, Mambo Kingz [Video Oficial].mp3",
+    "coverUrl": "covers/La Ocasión.png"
+  },
+  {
+    "title": "Sexto Sentido",
+    "artist": "Bad Bunny",
+    "genre": "Reggaeton",
+    "audioUrl": "music/Bad Bunny x Gigolo & La Exce - Sexto Sentido (Video Oficial).mp3",
+    "coverUrl": "covers/Sexto Sentido.png"
+  },
+  {
+    "title": "Un Polvo",
+    "artist": "Maluma",
+    "genre": "Reggaeton",
+    "audioUrl": "music/Maluma – Un Polvo [Letra].mp3",
+    "coverUrl": "covers/Un Polvo.png"
+  },
+  {
+    "title": "Me Ama Me Odia",
+    "artist": "Ozuna",
+    "genre": "Reggaeton",
+    "audioUrl": "music/Ozuna x Arcangel x Cosculluela x Brytiago - Me Ama Me Odia (Audio Oficial).mp3",
+    "coverUrl": "covers/Me Ama Me Odia.png"
+  },
+  {
+    "title": "Ella y yo - Remix",
+    "artist": "artista desconocido",
+    "genre": "Reggaeton",
+    "audioUrl": "music/Ella y yo - Remix Pepe Quintana Farruko ✖️ Ozuna ✖ ️Arcangel ✖️ Anuel AA ✖ ️Ñengo Flow y Más (Letra).mp3",
+    "coverUrl": "covers/Ella y yo.png"
+  },
+  {
+    "title": "La Paso Cabrón",
+    "artist": "Noriel",
+    "genre": "Reggaeton",
+    "audioUrl": "music/La Paso Cabrón (Cover Audio).mp3",
+    "coverUrl": "covers/La Paso Cabrón.png"
+  },
+  {
+    "title": "A lo Mejor",
+    "artist": "Banda MS",
+    "genre": "Corridos",
+    "audioUrl": "music/A lo mejor - Banda MS (Letra).mp3",
+    "coverUrl": "covers/A lo mejor.png"
+  },
+  {
+    "title": "Volvere",
+    "artist": "k-paz de la sierra",
+    "genre": "Corridos",
+    "audioUrl": "music/K-Paz De La Sierra - Volveré (LETRA).mp3",
+    "coverUrl": "covers/Volvere.png"
+  },
+  {
+    "title": "Como é bom",
+    "artist": "MC Pedrinho",
+    "genre": "Funk",
+    "audioUrl": "music/Mc Pedrinho Como é bom (plug)_(prod. offxio).mp3",
+    "coverUrl": "covers/Mc Pedrinho - Como é bom.png"
+  },
+  {
+    "title": "Dom Dom Dom Ultra Slowed",
+    "artist": "MC Pedrinho",
+    "genre": "Funk",
+    "audioUrl": "music/Mc Pedrinho dom dom dom ultra slowed.mp3",
+    "coverUrl": "covers/Mc Pedrinho dom dom dom.png"
+  },
+  {
+    "title": "OP NUEVO LEON",
+    "artist": "Jan Glack",
+    "genre": "Corridos",
+    "audioUrl": "music/Op Nuevo Leon.mp3",
+    "coverUrl": "covers/OP NUEVO LEON.png"
+  },
+  {
+    "title": "Plug de São Paulo",
+    "artist": "Plug",
+    "genre": "Funk",
+    "audioUrl": "music/Plug de São Paulo.mp3",
+    "coverUrl": "covers/Plug De Sao Paulo.png"
+  },
+  {
+    "title": "Sad Girl",
+    "artist": "Lana Del Rey",
+    "genre": "Alternative",
+    "audioUrl": "music/Sad Girl.mp3",
+    "coverUrl": "covers/Ultraviolence.png"
+  },
+  {
+    "title": "Si Tuviera Una Fortuna",
+    "artist": "Santa Grifa",
+    "genre": "Regional",
+    "audioUrl": "music/Si Tuviera Una Fortuna.mp3",
+    "coverUrl": "covers/Si Tuviera Una Fortuna.png"
+  },
+  {
+    "title": "Bendita Vida",
+    "artist": "Sid MSC ft. Chikis RA & Richard Ahumada",
+    "genre": "Urbano",
+    "audioUrl": "music/Sid MSC - Bendita Vida (Ft. Chikis RA & Richard Ahumada) (Video Oficial).mp3",
+    "coverUrl": "covers/Sid MSC - Bendita Vida.png"
+  },
+  {
+    "title": "...And To Those I Love, Thanks For Sticking Around",
+    "artist": "$uicideboy$",
+    "genre": "Rap",
+    "audioUrl": "music/SuicideBoy$ - ...And To Those I Love, Thanks For Sticking Around....mp3",
+    "coverUrl": "covers/And To Those I Love.png"
+  },
+  {
+    "title": "Vai Tomar Surra de Plug",
+    "artist": "Plug",
+    "genre": "Funk",
+    "audioUrl": "music/Vai Tomar Surra de Plug.mp3",
+    "coverUrl": "covers/Musicas Instaplayers.png"
+  },
+  {
+    "title": "West Coast",
+    "artist": "Lana Del Rey",
+    "genre": "Alternative",
+    "audioUrl": "music/West Coast (slowed + reverb) Lana Del Rey.mp3",
+    "coverUrl": "covers/Lana Del Rey.png"
+  },
+  {
+    "title": "La Primisa",
+    "artist": "Yahir Saldivar",
+    "genre": "Regional",
+    "audioUrl": "music/Yahir Saldivar - La Primisa (Letra).mp3",
+    "coverUrl": "covers/Yahir Saldivar - La Primisa.png"
+  }
+];
+
+const artists = [
+  { "name": "Jan Glack", "image": "artists/Jan Glack.png" },
+  { "name": "Radi0", "image": "artists/Radi0.png" },
+  { "name": "El Makabelico", "image": "artists/makabelico.png" },
+  { "name": "Bad Bunny", "image": "artists/Bad Bunny.png" },
+  { "name": "Grupo Feroz", "image": "artists/Grupo Feroz.png" },
+  { "name": "Joan Sebastian", "image": "artists/Joan Sebastian.png" },
+  { "name": "Ozuna", "image": "artists/Ozuna.png" },
+  { "name": "Mambo Kingz", "image": "artists/Mambo Kingz.png" },
+  { "name": "Jon Z", "image": "artists/Jon Z.png" },
+  { "name": "Noriel", "image": "artists/Noriel.png" },
+  { "name": "Ele A El Dominio", "image": "artists/Ele A El Dominio.png" },
+  { "name": "Yan Block", "image": "artists/Yan Block.png" },
+  { "name": "Rauw Alejandro", "image": "artists/Rauw Alejandro.png" },
+  { "name": "k-paz de la sierra", "image": "artists/k-paz de la sierra.png" },
+  { "name": "Omar Courtz", "image": "artists/Omar Courtz.png" },
+  { "name": "Pressure9x19", "image": "artists/Pressure9x19.png" },
+  { "name": "Banda MS", "image": "artists/Banda MS.png" },
+  { "name": "Ñengo Flow", "image": "artists/Ñengo Flow x La Mafia del Amor.png" },
+  { "name": "1tappworky", "image": "artists/1tappworky.png" },
+  { "name": "8Uno", "image": "artists/8Uno.png" },
+  { "name": "Santa Grifa", "image": "artists/Santa Grifa.png" },
+  { "name": "50/50", "image": "artists/5050.png" },
+  { "name": "ASAP Rocky", "image": "artists/ASAP Rocky.png" },
+  { "name": "Lana Del Rey", "image": "artists/Lana Del Rey.png" },
+  { "name": "KRIS R", "image": "artists/KRIS R.png" },
+  { "name": "El Americano 4kt", "image": "artists/El Americano 4kt.png" },
+  { "name": "Gucci Mane", "image": "artists/Gucci Mane.png" },
+  { "name": "Yahir Saldivar", "image": "artists/Yahir Saldivar.png" },
+  { "name": "Bryant Myers", "image": "artists/Bryant Myers.png" },
+  { "name": "J Balvin ft. Farruko", "image": "artists/J Balvin.png" },
+  { "name": "Jamby El Favo", "image": "artists/Jamby El Favo.png" },
+  { "name": "Alex Rose", "image": "artists/Alex Rose.png" },
+  { "name": "MC Pedrinho", "image": "artists/Mc Pedrinho.png" },
+  { "name": "$uicideboy$", "image": "artists/$uicideboy$.png" },
+  { "name": "Plug", "image": "artists/Musicas Instaplayers.png" }
+];
+
+let currentIndex = 0;
+let favorites = JSON.parse(localStorage.getItem("spoti_favorites") || "[]");
+let autoMode = false;
+
+const $ = id => document.getElementById(id);
+const audio = $("audio");
+audio.volume = 1;
+
+window.addEventListener("DOMContentLoaded", () => {
+  const savedLicense = localStorage.getItem("bl_music_license_active");
+  if (savedLicense) {
+    $("splash").classList.add("hidden");
+    enterMusic(savedLicense);
+  }
+});
+
+$("enterBtn").onclick = () => {
+  $("splash").classList.add("hidden");
+  $("loginScreen").classList.remove("hidden-login");
+  $("loginScreen").setAttribute("aria-hidden","false");
+  setTimeout(() => $("userName").focus(), 300);
+};
+
+$("blLoginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  
+  const user = $("userName").value.trim();
+  const pass = $("userPassword").value.trim();
+  const key = $("licenseKey").value.trim().toUpperCase();
+  const status = $("loginStatus");
+
+  if (!user || !pass || !key) {
+    status.textContent = "Por favor completa los 3 campos.";
+    status.className = "login-status";
+    return;
+  }
+
+  status.textContent = "Verificando clave...";
+  status.className = "login-status";
+
+  // VALIDACIÓN DE KEYS
+  if (!VALID_KEYS.has(key)) {
+    status.textContent = "La clave ingresada no es válida.";
+    return;
+  }
+
+  let usedKeys = JSON.parse(localStorage.getItem("bl_music_used_keys") || "{}");
+
+  if (usedKeys[key] && usedKeys[key] !== user) {
+    status.textContent = "Esta clave ya fue usada en otro dispositivo.";
+    return;
+  }
+
+  try {
+    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+      const db = firebase.firestore();
+      const docRef = db.collection("licencias").doc(key);
+      const doc = await docRef.get();
+
+      if (!doc.exists) {
+        status.textContent = "La licencia no existe o es incorrecta.";
+        return;
+      }
+
+      const data = doc.data();
+
+      if (data.usada && data.usuarioActivador !== user) {
+        status.textContent = "Esta licencia ya se activó en otro dispositivo.";
+        return;
+      }
+
+      await docRef.update({
+        usada: true,
+        usuarioActivador: user,
+        fechaActivacion: new Date().toISOString()
+      });
+    }
+
+    usedKeys[key] = user;
+    localStorage.setItem("bl_music_used_keys", JSON.stringify(usedKeys));
+
+    localStorage.setItem("bl_music_license_active", key);
+    localStorage.setItem("bl_music_user", user);
+
+    status.textContent = "¡Acceso concedido!";
+    status.className = "login-status ok";
+    
+    setTimeout(() => enterMusic(key), 800);
+
+  } catch (err) {
+    console.error(err);
+    status.textContent = "Error al conectar con el servidor.";
+  }
+});
+
+function enterMusic(key){
+  $("loginScreen").classList.add("hidden-login");
+  $("loginScreen").setAttribute("aria-hidden","true");
+  $("app").classList.remove("hidden");
+  renderSongs(songs);
+  renderRows(songs, $("searchResults"));
+  renderArtists();
+}
+
+document.querySelectorAll("[data-page]").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+    $(btn.dataset.page).classList.add("active");
+
+    if(btn.dataset.page==="favorites") renderFavorites();
+    if(btn.dataset.page==="artists") renderArtists();
+
+    if(btn.dataset.page==="search"){
+      resetSearchPage();
+      renderRows(songs, $("searchResults"));
+    }
+  };
+});
+
+function resetSearchPage(){
+  $("search").innerHTML = `
+    <h1>Buscar</h1><br>
+    <div id="searchResults" class="list"></div>
+  `;
+}
+
+function goToPage(pageId){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  $(pageId).classList.add("active");
+}
+
+$("backFromArtists").onclick = () => {
+  goToPage("home");
+};
+
+function renderSongs(list){
+  $("songsGrid").innerHTML = "";
+
+  list.forEach((song,i)=>{
+    const card=document.createElement("div");
+    card.className="card song-card";
+    card.innerHTML=`
+      <img src="${song.coverUrl}" onerror="this.src='logo.png'">
+      <h3>${song.title}</h3>
+      <p>${song.artist}</p>
+    `;
+    card.onclick=()=>playSong(i,false);
+    $("songsGrid").appendChild(card);
+  });
+}
+
+function renderRows(list,container){
+  container.innerHTML="";
+
+  if(list.length===0){
+    container.innerHTML="<p class='muted'>No hay resultados.</p>";
+    return;
+  }
+
+  list.forEach(song=>{
+    const i=songs.indexOf(song);
+    const row=document.createElement("div");
+    row.className="row";
+    row.innerHTML=`
+      <img src="${song.coverUrl}" onerror="this.src='logo.png'">
+      <div style="flex:1">
+        <b>${song.title}</b><br>
+        <span class="muted">${song.artist} • ${song.genre}</span>
+      </div>
+      <button class="btn">▶</button>
+    `;
+    row.onclick=()=>playSong(i,false);
+    container.appendChild(row);
+  });
+}
+
+function getArtistSongs(artist){
+  return songs.filter(song =>
+    song.artist.toLowerCase().includes(artist.name.toLowerCase()) ||
+    artist.name.toLowerCase().includes(song.artist.toLowerCase())
+  );
+}
+
+function renderArtists(){
+  const box = $("artistsGrid");
+  if(!box) return;
+
+  box.innerHTML = "";
+
+  artists.forEach(artist=>{
+    const artistSongs = getArtistSongs(artist);
+
+    const card = document.createElement("div");
+    card.className = "artist-card";
+    card.innerHTML = `
+      <img src="${artist.image}" onerror="this.src='logo.png'">
+      <h3>${artist.name}</h3>
+      <p class="muted">${artistSongs.length} canciones</p>
+    `;
+    card.onclick = () => showArtistSongs(artist);
+    box.appendChild(card);
+  });
+}
+
+function showArtistSongs(artist){
+  const artistSongs = getArtistSongs(artist);
+
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  $("search").classList.add("active");
+
+  $("search").innerHTML = `
+    <button id="backToArtists" class="back-btn btn">⬅ Retroceder</button>
+    <div class="artist-title">
+      <img src="${artist.image}" onerror="this.src='logo.png'">
+      <div>
+        <h1>${artist.name}</h1>
+        <p class="muted">${artistSongs.length} canciones</p>
+      </div>
+    </div>
+    <div id="searchResults" class="list"></div>
+  `;
+
+  $("backToArtists").onclick = () => {
+    resetSearchPage();
+    renderArtists();
+    goToPage("artists");
+  };
+
+  renderRows(artistSongs, $("searchResults"));
+}
+
+function playSong(i,isAuto=false){
+  if(!songs[i]) return;
+
+  autoMode = isAuto;
+  currentIndex = i;
+  const song = songs[i];
+
+  $("player").classList.remove("hidden");
+  $("playerCover").src = song.coverUrl;
+  $("playerTitle").textContent = song.title;
+  $("playerArtist").textContent = song.artist;
+  
+  if ("mediaSession" in navigator){
+    navigator.mediaSession.metadata = new MediaMetadata({
+        title: song.title,
+        artist: song.artist,
+        album: "Bolito MUSIC",
+        artwork: [
+          {
+            src: new URL(song.coverUrl, window.location.href).href,
+            sizes: "512x512",
+            type: "image/png"
+          }
+        ]
+    });
+
+    navigator.mediaSession.setActionHandler("play", ()=>audio.play());
+    navigator.mediaSession.setActionHandler("pause", ()=>audio.pause());
+
+    navigator.mediaSession.setActionHandler("nexttrack", ()=>{
+        currentIndex++;
+        if(currentIndex>=songs.length){ currentIndex=0; }
+        playSong(currentIndex,false);
+    });
+
+    navigator.mediaSession.setActionHandler("previoustrack", ()=>{
+        currentIndex--;
+        if(currentIndex<0){ currentIndex=songs.length-1; }
+        playSong(currentIndex,false);
+    });
+  }
+
+  $("favBtn").textContent = favorites.includes(song.title) ? "♥" : "♡";
+  $("playBtn").textContent = "⏳";
+  $("timeInfo").textContent = "0:00 / 0:00";
+  $("progress").value = 0;
+
+  audio.pause();
+  audio.src = song.audioUrl;
+  audio.load();
+
+  audio.play().then(()=>{
+    $("playBtn").textContent = "⏸";
+  }).catch(error=>{
+    console.log("No se pudo reproducir:", song.audioUrl, error);
+    $("playBtn").textContent = "▶";
+
+    if(isAuto){
+      playRandomSong();
+    }else{
+      alert("No se pudo reproducir esta canción. Revisa que exista exactamente:\n" + song.audioUrl);
+    }
+  });
+}
+
+function randomSong(){
+  if(songs.length <= 1) return currentIndex;
+
+  let next;
+  do{
+    next = Math.floor(Math.random() * songs.length);
+  }while(next === currentIndex);
+
+  return next;
+}
+
+function playRandomSong(){
+  playSong(randomSong(),true);
+}
+
+$("playBtn").onclick=()=>{
+  if(audio.paused){
+    audio.play().then(()=>{
+      $("playBtn").textContent="⏸";
+    }).catch(()=>{
+      alert("Selecciona una canción manualmente.");
+    });
+  }else{
+    audio.pause();
+    $("playBtn").textContent="▶";
+  }
+};
+
+$("nextBtn").onclick = () => {
+    currentIndex++;
+    if(currentIndex >= songs.length){ currentIndex = 0; }
+    playSong(currentIndex,false);
+};
+
+$("prevBtn").onclick = () => {
+    currentIndex--;
+    if(currentIndex < 0){ currentIndex = songs.length-1; }
+    playSong(currentIndex,false);
+};
+
+$("volume").oninput=e=>{
+  const vol = Number(e.target.value);
+  $("volumeText").textContent = vol + "%";
+  audio.volume = Math.min(vol / 100, 1);
+};
+
+audio.ontimeupdate=()=>{
+  if(audio.duration){
+    $("progress").value=(audio.currentTime/audio.duration)*100;
+    $("timeInfo").textContent = formatTime(audio.currentTime) + " / " + formatTime(audio.duration);
+  }else{
+    $("timeInfo").textContent = "0:00 / 0:00";
+  }
+};
+
+function formatTime(seconds){
+  if(!seconds || isNaN(seconds)) return "0:00";
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return mins + ":" + secs.toString().padStart(2,"0");
+}
+
+$("progress").oninput=e=>{
+  if(audio.duration){
+    audio.currentTime=(e.target.value/100)*audio.duration;
+  }
+};
+
+audio.onended = () => {
+  currentIndex++;
+  if(currentIndex >= songs.length){ currentIndex = 0; }
+  playSong(currentIndex,true);
+};
+
+audio.onerror = () => {
+  if(!songs[currentIndex]) return;
+  $("playBtn").textContent = "▶";
+
+  if(autoMode){
+    playRandomSong();
+  }else{
+    alert("No se pudo reproducir esta canción. Revisa que exista exactamente:\n" + songs[currentIndex].audioUrl);
+  }
+};
+
+$("favBtn").onclick=()=>{
+  const title=songs[currentIndex].title;
+
+  if(favorites.includes(title)){
+    favorites=favorites.filter(x=>x!==title);
+  }else{
+    favorites.push(title);
+  }
+
+  localStorage.setItem("spoti_favorites",JSON.stringify(favorites));
+  $("favBtn").textContent=favorites.includes(title)?"♥":"♡";
+};
+
+function renderFavorites(){
+  const favSongs=songs.filter(s=>favorites.includes(s.title));
+  renderRows(favSongs,$("favoritesList"));
+}
+
+const backToTop = $("backToTop");
+
+window.addEventListener("scroll",()=>{
+  if(window.scrollY > 500){
+    backToTop.classList.add("show");
+  }else{
+    backToTop.classList.remove("show");
+  }
+},{passive:true});
+
+backToTop.onclick=()=>{
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+};
+
+$("searchInput").oninput=e=>{
+  const text=e.target.value.toLowerCase();
+
+  const filtered=songs.filter(s=>
+    s.title.toLowerCase().includes(text) ||
+    s.artist.toLowerCase().includes(text) ||
+    s.genre.toLowerCase().includes(text)
+  );
+
+  resetSearchPage();
+  renderRows(filtered,$("searchResults"));
+
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  $("search").classList.add("active");
+};
+</script>
+
+</body>
+</html>

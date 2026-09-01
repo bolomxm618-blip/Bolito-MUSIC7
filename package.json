@@ -1,0 +1,18 @@
+{
+  "name": "bl-music-demon",
+  "version": "1.0.0",
+  "description": "BL Music - Tu música, tu estilo",
+  "private": true,
+  "scripts": {
+    "dev": "npx http-server -p 3000",
+    "build": "echo 'Build complete - static files ready'",
+    "lint": "echo 'No linter configured for static HTML project'"
+  },
+  "dependencies": {
+    "@vercel/analytics": "^1.4.1"
+  },
+  "devDependencies": {},
+  "keywords": ["music", "player", "static"],
+  "author": "",
+  "license": "ISC"
+}
